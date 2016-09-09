@@ -1,47 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
+import java.util.Random;
 
 class BallPanel extends JPanel {
     private int count = 0;
-    private static final int XSIZE = 20;
-    private static final int YSIZE = 20;
-    private int x = 0;
-    private int  y= 0;
-    private int dx = 2;
-    private int dy = 2;
+    private ArrayList <Ball> balls_array;
 
-    public BallPanel(){
-        x = 25;
-        y = 25;
-        this.repaint();
-    }
-
-    public void draw (Graphics2D g2) {
-        g2.setColor(Color.darkGray);
-        g2.fill(new Ellipse2D.Double(x,y,XSIZE,YSIZE));
-
-    }
-
-    public void move() {
-        x += dx;
-        y += dy;
-        if (x < 0) {
-            x = 0;
-            dx = -dx;
-        }
-        if (x + XSIZE >= this.getWidth()) {
-            x = this.getWidth()-XSIZE;
-            dx = -dx;
-        }
-        if (y < 0) {
-            y = 0;
-            dy = -dy;
-        }
-        if (y + YSIZE >= this.getHeight()) {
-            y = this.getHeight() - YSIZE;
-            dy = -dy;
-        }
+    BallPanel(){
+        this.balls_array = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < 5; i++)
+            balls_array.add(new Ball(random.nextInt(100), random.nextInt(100)));
 
         this.repaint();
     }
@@ -53,9 +24,46 @@ class BallPanel extends JPanel {
         this.draw(g2);
     }
 
+    private void draw(Graphics2D g2) {
+        for (Ball aBalls_array : balls_array) {
+            move(aBalls_array);
+            g2.setColor(aBalls_array.getColor());
+            g2.fill(new Ellipse2D.Double(
+                    aBalls_array.getX(),
+                    aBalls_array.getY(),
+                    aBalls_array.getXsize(),
+                    aBalls_array.getYsize()));
+        }
+    }
+
     private void updateCounter() {
         count++;
         System.out.println("Direction changed " + count + " times");
+    }
+
+    private void move(Ball ball) {
+        ball.updatePosition();
+
+        if (ball.getX() < 0) {
+            ball.resetX();
+            ball.reverseDx();
+            updateCounter();
+        }
+        if (ball.getX() + ball.getXsize() >= this.getWidth()) {
+            //x = this.getWidth() - ball.getXsize();
+            ball.reverseDx();
+            updateCounter();
+        }
+        if (ball.getY() < 0) {
+            ball.resetY();
+            ball.reverseDy();
+            updateCounter();
+        }
+        if (ball.getY() + ball.getYsize() >= this.getHeight()) {
+            //y = -ball.getYsize();
+            ball.reverseDy();
+            updateCounter();
+        }
     }
 }
 
